@@ -1,0 +1,409 @@
+#!/usr/bin/perl 
+
+################################################################################
+# convert_charset - Convert tables in a given schema to a target character set
+# 
+# @author     Ryan Lowe <ryan.a.lowe@percona.com>
+# @date       2009-03-04
+# @inspiredby http://www.haidongji.com/
+#             
+# @todo Handle Foreign Keys Appropriately
+#       Throttle the number of threads executing at any one time
+################################################################################
+
+use strict; 
+use warnings FATAL => 'all';
+use Pod::Usage;
+use Getopt::Long qw(:config no_ignore_case bundling);
+use English qw(-no_match_vars);
+use DBI; 
+
+my $PROGRAM  = 'convert_charset';
+my $VERSION  = '0.0.1';
+
+my @t_tables;
+my @tables;
+my @t_ignore_tables;
+my @ignore_tables;
+my @t_ignore_columns;
+my %ignore_columns;
+
+################################################################################
+# Get configuration information
+################################################################################
+
+my %options;
+my $gop=new Getopt::Long::Parser;
+
+if (!$gop->getoptions(
+    'askpass'          => \$options { 'askpass' },
+    'charset=s'        => \$options { 'charset' },
+    'collate=s'        => \$options { 'collate' },
+    'database|d=s'     => \$options { 'database' },
+    'help|?'           => \$options { 'help' },
+    'host|h=s'         => \$options { 'host' },
+    'ignore-columns=s' => \$options { 'ignore_columns' },
+    'ignore-tables=s'  => \$options { 'ignore_tables' },
+    'numthreads=i'     => \$options { 'numthreads' },
+    'password|p=s'     => \$options { 'password' },
+    'port=i'           => \$options { 'port' },
+    'tables=s'         => \$options { 'tables' },
+    'test'             => \$options { 'test' },
+    'user|u=s'         => \$options { 'user' },
+    'verbose|v'        => \$options { 'verbose' },
+    'version|V'        => \$options { 'version' } ) ) {
+    pod2usage(2);
+}
+
+################################################################################
+# Die when necessary, then set sane defaults
+################################################################################
+
+pod2usage(2) if ($options{'help'});
+
+if ($options{'version'}) {
+    print "$PROGRAM $VERSION\n";
+    exit;
+}
+
+if (!$options{'database'}) {
+    print "Database is REQUIRED\n";
+    pod2usage(2);
+    exit 1;
+}
+
+if ($options{'tables'} && $options{'ignore_tables'}) {
+    print "The --tables and --ignore-tables options are exclusive\n";
+    pod2usage(2);
+    exit 1;
+}
+
+$options{'config'}  = $ENV{HOME}.'/.my.cnf';
+$options{'host'}    = $options{'host'}    ? $options{'host'}    : 'localhost';
+$options{'user'}    = $options{'user'}    ? $options{'user'}    : $ENV{USER};
+$options{'port'}    = $options{'port'}    ? $options{'port'}    : '3306';
+$options{'charset'} = $options{'charset'} ? $options{'charset'} : 'utf8';
+
+if ($options{'askpass'}) {
+    $options{'password'} = &askpass($options{'user'}.'@'.$options{'host'});
+}
+
+if ($options{'tables'}) {
+    @t_tables = split(/,/, $options{'tables'});
+}
+
+if ($options{'ignore_tables'}) {
+    @t_ignore_tables = split(/,/, $options{'ignore_tables'});
+}
+
+if ($options{'ignore_columns'}) {
+    @t_ignore_columns = split(/,/, $options{'ignore_columns'});
+}
+
+if (!$options{'numthreads'}) {
+    eval {
+        # Try to read --numthread from the number of CPUs in /proc/cpuinfo.  
+        # This only works on GNU/Linux.
+        open my $file, "<", "/proc/cpuinfo"
+            or die $OS_ERROR;
+        local $INPUT_RECORD_SEPARATOR = undef;
+        my $contents = <$file>;
+        close $file;
+        $options{numthreads} = scalar(map { $_ } $contents =~ m/(processor)/g);
+    };
+
+    eval {
+        # Try to get from system profiler
+        $options{numthreads} ||=
+         `system_profiler |grep -i 'Total Number Of Cores:' |awk {'print $5'}`;
+    };
+
+    $options{numthreads} ||= $ENV{NUMBER_OF_PROCESSORS}; # MSWin32
+    $options{numthreads} ||= 2;
+
+    chomp($options{numthreads});
+}
+
+################################################################################
+# Begin main() 
+################################################################################
+
+# We want to do this so that any tables added while this process is running
+# will automatically be the target character set
+
+print "
+You MUST first set the default character set by adding the following
+lines to my.cnf on the target host (substitute utf8 for your target charset):
+
+default_character_set = utf8
+
+And issue the following command in the mysql command prompt, substituting 
+utf8 for your target character set:
+
+SET GLOBAL character_set_server=utf8;
+
+Have you done this yet? [y/N] ";
+
+my $answer = uc(<STDIN>);
+chomp($answer);
+if ($answer ne 'Y') {
+    print "You MUST first perform the above two tasks\n";
+    exit 1;
+}
+
+my $dsn = "DBI:mysql:;host=$options{'host'};port=$options{'port'};".
+          "database=$options{'database'};".
+          "mysql_read_default_file=$options{'config'};".
+          "mysql_read_default_group=client";
+
+my $dbh = DBI->connect(
+    $dsn,
+    $options{'user'}     ? $options{'user'}     : undef,
+    $options{'password'} ? $options{'password'} : undef,
+    { RaiseError => 1,
+      PrintError => 0,
+      AutoCommit => 1,
+    },
+);
+
+&validate_charset($options{'charset'});
+&validate_collation($options{'collate'}) if ($options{'collate'});
+
+# Get a list of all tables in the target database.  We don't get all 
+# column information up front so that we can parallelize and lock
+# individual tables, needed due to potential ALTER statements run
+# against them while this script is running.
+my $q_tables = "
+SELECT `TABLE_NAME`
+  FROM `INFORMATION_SCHEMA`.`TABLES`
+  WHERE `TABLE_SCHEMA` = ".$dbh->quote($options{'database'})."
+    AND `TABLE_TYPE` = 'BASE TABLE'
+";
+
+if (@t_tables) {
+    foreach my $table (@t_tables) {
+        push(@tables, $dbh->quote($table));
+    }
+
+    $q_tables .= ' AND `TABLE_NAME` IN ('.join(',', @tables).")\n";
+} elsif (@t_ignore_tables) {
+    foreach my $table (@t_ignore_tables) {
+        push(@ignore_tables, $dbh->quote($table));
+    }
+
+    $q_tables .= ' AND `TABLE_NAME` NOT IN ('.join(',', @ignore_tables).")\n";
+}
+
+my $tables = $dbh->selectall_hashref($q_tables, 1);
+
+# Fail early, fail often:)
+if (@tables && (scalar(keys %{$tables}) ne scalar(@tables))) {
+    print "You have specified a table that does not exist:\n    ";
+    print join("\n    ",@t_tables)."\n";
+    exit 1; 
+} elsif (@ignore_tables) {
+    my $ignore_query = "
+SELECT COUNT(*) AS `c`
+  FROM `INFORMATION_SCHEMA`.`TABLES`
+  WHERE `TABLE_SCHEMA` = ".$dbh->quote($options{'database'})."
+    AND `TABLE_NAME` IN (".join(',', @ignore_tables).")
+";
+
+    my $ignores = $dbh->selectrow_hashref($ignore_query);
+
+    if ($ignores->{'c'} ne scalar(@ignore_tables)) {
+        print "You have tried to ignore a table that does not exist:\n    ";
+        print join("\n    ",@t_ignore_tables)."\n";
+        exit 1;
+    }
+}
+
+if (@t_ignore_columns) {
+    foreach my $column (@t_ignore_columns) {
+        my @cols = split(/\./, $column);
+        $ignore_columns{$cols[0]}{$cols[1]} = 1;
+    }    
+}
+
+$dbh->disconnect();
+
+foreach my $table (keys %{$tables}) {
+    my $pid = fork();
+    print "Resources Not Available\n" if (not defined $pid);
+
+    if ($pid==0) { # We are the child
+        &convert($options{'database'}, $table, $ignore_columns{$table}, $dbh);
+        exit;
+    }
+    do {} while wait > 0;
+}
+
+################################################################################
+# Subroutines & Helper Functions
+################################################################################
+
+sub askpass {
+    my $auth = shift;
+    print "Please enter password for $auth: ";
+    system("stty -echo");
+    my $password = <STDIN>;
+    chomp($password);
+    system("stty echo");
+    return $password;
+}
+
+sub validate_charset {
+    my $target = shift;
+    my $charsets = $dbh->selectall_hashref('SHOW CHARACTER SET', 'Charset');
+    
+    if (!$charsets->{$target}) {
+        print "Invalid Character Set: $target\n";
+        print "To see a list of supported character sets, SHOW CHARACTER SET\n";
+        exit 1;
+    }
+}
+
+sub validate_collation {
+    my $target = shift;
+    my $collations = $dbh->selectall_hashref('SHOW COLLATION', 'Collation');
+
+    if (!$collations->{$target}) {
+        print "Invalid Collation: $target\n";
+        print "To see a list of supported collations, SHOW COLLATION\n";
+        exit 1;
+    }
+}
+
+sub convert {
+    my ($database, $table, $cols_to_ignore, $ldbh) = @_;
+
+    # Get mapping of all current data types so we can fix later
+    my $query = "
+SELECT `COLUMN_NAME`,
+       `DATA_TYPE`,
+       `COLUMN_TYPE`,
+       `IS_NULLABLE`,
+       `COLUMN_DEFAULT`,
+       `COLUMN_COMMENT` 
+  FROM `INFORMATION_SCHEMA`.`COLUMNS`
+  WHERE `CHARACTER_SET_NAME` IS NOT NULL  
+    AND `TABLE_SCHEMA` = ".$dbh->quote($database)."
+    AND `TABLE_NAME`   = ".$dbh->quote($table)."
+";
+
+    if ($cols_to_ignore) {
+        my @cti = keys %{$cols_to_ignore};
+        my @columns;
+    
+        foreach my $col (@cti) {
+            push(@columns, $dbh->quote($col));
+        }
+
+        $query .= " AND `COLUMN_NAME` NOT IN (".join(',', @columns).")";
+    }
+
+    my $dbh = DBI->connect(
+        $dsn,
+        $options{'user'}     ? $options{'user'}     : undef,
+        $options{'password'} ? $options{'password'} : undef,
+        { RaiseError => 1,
+          PrintError => 0,
+          AutoCommit => 1,
+        },
+    );
+
+    my $column_info = $dbh->selectall_hashref($query,'COLUMN_NAME');
+
+    my $alter = '
+ALTER TABLE `'.$database.'`.`'.$table.'`
+  DEFAULT CHARSET='.$options{'charset'};
+    $alter .= ' COLLATE='.$options{'collate'} 
+        if ($options{'collate'});
+
+    if (scalar(keys %{$column_info})) {
+        foreach my $d (keys %{$column_info}) {
+            my $c = $column_info->{$d};
+
+            $alter .= '
+, MODIFY COLUMN `'.$c->{COLUMN_NAME}.'` '.$c->{COLUMN_TYPE};
+            $alter .= ' CHARACTER SET '.$options{'charset'};
+            $alter .= ' NOT NULL' if ($c->{IS_NULLABLE} eq 'NO');
+            $alter .= ' DEFAULT '.$dbh->quote($c->{COLUMN_DEFAULT})
+                if ($c->{COLUMN_DEFAULT});
+            $alter .= ' COLLATE '.$options{'collate'}
+                if ($options{'collate'});
+            $alter .= ' COMMENT '.$dbh->quote($c->{COLUMN_COMMENT})
+                if ($c->{COLUMN_COMMENT});
+        }
+    }
+
+    if ($options{'test'}) {
+        print "\n$alter;\n";
+    } else {
+        eval {
+            $dbh->do($alter);
+        };
+
+        if (!$@) {
+            print "$table successfully converted\n";
+        } else {
+            print "There was a problem converting $table:\n";
+            print "$alter\n";
+            print $@;
+        }
+    }
+
+    $dbh->disconnect();
+    return;
+}
+
+=pod
+
+=head1 NAME
+
+convert_charset - Convert tables to a target character set / collation
+
+=head1 SYNOPSIS
+
+ convert_charset --database=<database> [options] 
+
+ Options:
+   --askpass        Prompt for a MySQL password
+   --charset        The target character set to convert to
+   --collate        The target collation to convert to
+   --database|d     The target database
+   --help|?         Display this help and exit
+   --host|h         The target host
+   --ignore-columns Columns to ignore, useful if you want to 
+                    keep the existing charset for a target column
+                    Comma-separated.  NO SPACES.
+                    table.column
+   --ignore-tables  A comma-separated list of tables to ignore
+   --password|p     The MySQL password to use
+   --port           The target port
+   --tables         A comma-separated list of tables to convert. 
+                    All non-named tables will be ignored
+   --test           Print the ALTER statements that would be executed
+                    without executing them.
+   --user|u         The MySQL user
+   --version|V      Display version information and exit
+
+ defaults are:
+
+ ATTRIBUTE                  VALUE
+ -------------------------- ------------------
+ askpass                    FALSE
+ charset                    utf8
+ collate                    No Default Value
+ database                   No Default Value
+ help                       FALSE
+ host                       localhost
+ ignore-columns             No Default Value
+ ignore-tables              No Default Value
+ password                   No Default Value
+ port                       3306
+ tables                     No Default Value
+ test                       FALSE
+ user                       Current User
+ version                    FALSE
+

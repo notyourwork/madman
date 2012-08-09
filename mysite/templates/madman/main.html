@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %} 
+
+{% block title %}{{ block.super }} :: Homepage{% endblock %}
+
+
+{% block madmannav %}
+{% endblock %}
+
+{% block content %}
+<div class="grid_8">
+    <h1>Media Locations</h1>
+    <ul>
+    {% for location in current_locations %}
+        <div class="item 
+        {% if forloop.first %}item_top{% endif %}
+        {% if forloop.last %}item_bottom{% endif %} 
+        ">
+            <img class="item_img" src="{% static "img/milky/48/18.png"%}"/>
+            <span><a href="{{location.get_absolute_url}}">{{ location.name|title }}</a> </span>
+            <br/>
+            <span> {{location.print_size}} {{location.updated_time|date:"m/d/y H:m:s"}} </span>
+        </div>
+   {% empty %} 
+        <div class="item">No media locations defined right now.</div>
+   {% endfor %}
+    </ul>
+    
+</div>
+<div class="grid_8">
+    <h1>Latest Media Locations</h1>
+    <ul>
+    {% for location in newest_locations %}
+        <div class="item 
+        {% if forloop.first %}item_top{% endif %}
+        {% if forloop.last %}item_bottom{% endif %} 
+        ">
+            <img class="item_img" src="{% static "img/milky/48/18.png"%}"/>
+            <span><a href="{{location.get_absolute_url}}">{{ location.name|title }}</a></span>
+            <br/>
+            <span> {{location.print_size}} {{location.updated_time|date:"m/d/y H:m:s"}} </span>
+        </div>
+   {% empty %} 
+        <div class="item">No media locations defined right now.</div>
+   {% endfor %}
+    </ul>
+
+    <h1>Media Files</h1>
+    {% for file in latest_file_list %}
+        <div class="item
+            {% if forloop.first %}item_top{% endif %}
+            {% if forloop.last %}item_bottom{% endif %} 
+        ">
+            <img class="item_img" src="{% static "img/milky/48/18.png"%}"/>
+            <span><a href="{{ file.get_absolute_url }}">{{ file.name }}</a></span>
+            <br/>
+            <span>{{ file.get_location.get_path }}</span>
+            
+        </div>
+    {% empty %} 
+    <p>No files right now.</p>
+                
+    {% endfor %}
+        
+        <p><em><a href="/madman/list/file/">List files here</a></em></p>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,11 @@
+{% extends "loggedin.html" %}
+
+{% block content %}
+    <ul>
+    {% for object in object_list %}
+        <li>{{ object }} </li>
+    {% empty %} 
+        <li>No users currently defined!</li>
+    {% endfor %} 
+    </ul>
+{% endblock %}

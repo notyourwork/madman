@@ -1,0 +1,47 @@
+Madman Installation 
+--------------------------
+    For a clean installation run build.sh   
+        see file for options 
+    If you have a django environment setup
+        add madman to your django application settings 
+        and run ./manage.py minstall which will 
+        run the madman installation 
+
+--------------------------
+Requirements 
+    [for specific installation instructions see each packages documentation]
+    -iPython (http://ipython.org/) 
+        enhanced interpreter with goodies 
+    -clint (http://pypi.python.org/pypi/clint/0.2.1)
+        command line interface tools (text formatting, progress bars, goodies for cli environment) 
+    -fabric (http://docs.fabfile.org/en/1.4.0/index.html) 
+        for cross madman deploymeny synching - its a nice package 
+    -django 1.3.1 +                 --> (pip, yum, manually) 
+    -buildbot (pip)                 --> 
+    -django-staticfiles (pip)       --> Package for static files 
+    -django-debug-toolbar (pip)     --> Debug toolbar for Django 
+    -django-profiles (pip)          --> Django user profile app 
+    -django-registration (pip)      --> registration app
+    -django_extensions (pip)        --> some bad ass django commands 
+    -django-tagging (pip)           --> django app for tagging objects 
+    -mptt (pip)                     --> this is the tree library 
+
+    -jit (javascript library, comes built into repo but worth mentioning we will use this for library/tree visuals)
+
+--------------------------------------------------------------------
+
+Mutagen - python audio metadata lib 
+    (http://code.google.com/p/mutagen/)
+    easy_install mutagen 
+
+hachoir-metadata | hachoir-core | hachoir-parser 
+    metadata for audio/video files 
+    easy_install hachoir-metadata, hachoir-core, hachoir-parser 
+    (http://pypi.python.org/pypi/hachoir-metadata)
+
+
+    alternative: http://doc.freevo.org/2.0/Kaa
+
+    pyUnRAR2 - 
+        easy_install pyUnRAR2
+        for unpacking rars and shit 

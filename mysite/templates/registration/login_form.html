@@ -1,0 +1,46 @@
+<style type="text/css">
+
+    #inline-login{
+        overflow: auto;
+        width: 500px;
+        height: 100px;
+        background-color: #FDFDFD;
+    }
+</script>
+
+    <div id="inline-login" style="display:none;">
+
+        <h1>Log in</h1>
+        {% if form.errors %}
+            <p class="error">Please correct the errors below:</p>
+        {% endif %}
+
+        <form method="post" action="?next={{ next|default:"/" }}">{% csrf_token %}
+            <dl>
+                <dt>
+                    <label for="id_username">Username:</label>
+                    {% if form.username.errors %} <span class="error">{{ form.username.errors|join:", " }}</span>{% endif %}
+                </dt>
+                <dd>
+                    {{ form.username }}
+                </dd>
+                <dt>
+                    <label for="id_password">Password:</label>
+                    {% if form.password.errors %} <span class="error">{{ form.password.errors|join:", " }}</span>{% endif %}
+                </dt>
+                <dd>
+                    {{ form.password }}
+                </dd>
+                <dt>
+                    <input type="submit" value="Log in" />
+                </dt>
+            </dl>
+        </form>
+        <h2>Login using <a href="http://oauth.net/">OAuth</a></h2>
+        <p><a href="/social/login/facebook/">Login with facebook</a></p>
+        <p><a href="/social/login/google/">Login with google</a></p>
+        <p><a href="/social/login/linkedin/">Login with linkedin</a></p>
+        <p><a href="/social/login/twitter/">Login with twitter</a> </p>
+
+        <p>You can <a href="/accounts/register/">sign up</a> for an account.</p>
+    </div>

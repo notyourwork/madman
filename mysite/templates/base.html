@@ -1,0 +1,109 @@
+{% load url from future %}
+{% load static %}
+{% load flatpages %}
+ 
+<!DOCTYPE html>  
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    {% block head %}
+    <title>{% block title %}Madman v1.0{% endblock %}</title>
+    <link rel="stylesheet" href="{% static "css/reset.css" %}" />
+    <link rel="stylesheet" href="{% static "css/text.css" %}" />
+    <link rel="stylesheet" href="{% static "css/960.css" %}" />
+    <link rel="stylesheet" href="{% static "css/styles.css" %}" />
+    {% endblock head %}
+</head>
+<body>
+    <div id="body">
+        <div class="container_16 " id="header">
+            <div class="grid_6" id="logo_box">
+                <img src="{% static "img/logo2.gif" %}" id="logo"/>
+            </div>
+            <div class="grid_10" id="status"> 
+                {% if user.is_authenticated %} 
+                    <p>Welcome, {{ user }}</p>
+                    <a href="{% url 'auth_logout' %}">Log Out</a>
+                {% else %} 
+                    <a href="{% url 'auth_login' %}">Log In</a>
+                {% endif %} 
+
+            </div>
+            
+            <div class="clear"></div>
+        </div>
+        
+        <div class="container_16 " id="nav">
+            <div class="grid_16">
+                <div id="nav_top">
+                    <span class="nav_top_item"><a href="{% url 'home' %}">Home</a></span>
+                    {% block madmannav %} 
+                    {% endblock %} 
+                    <span class="nav_top_item nav_top_item_last" id="control_panel_button">Control Panel</span>
+                    <span class="nav_top_item nav_top_item_last" id="search_button">Search</span>
+                </div>
+            </div>
+            <!-- overlay begins here ignore this in regards to 960 grid structure--> 
+            <div id="overleft" class="item_bottom">
+                
+                <div id="overleft_header">
+                    <span class="nav_top_item nav_top_item_last">Hide</span>
+                </div>
+                <div id="control_panel" class="item_top item_bottom" >
+                    <a href="{% url 'home' %}"><img src="{% static "img/milky/64/1.png"%}"/>Home</a>     
+                    <a href="#"><img src="{% static "img/milky/64/18.png"%}"/>Media</a>
+                    <a href="{% url 'report' %}"><img src="{% static "img/milky/64/11.png"%}"/>Reports</a>
+                    <a href="/admin/#"><img src="{% static "img/milky/64/21.png"%}"/>Admin</a>
+                    {% get_flatpages as flatpages %}
+                    {% for page in flatpages %}
+                        <a href="{{page.url}}"><img src="{% static "img/milky/64/41.png"%}"/>{{page.title}}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- overlay ends here --> 
+            <div class="clear"></div>
+            <div class="area_main">
+                <div class="grid_16" id="inputArea">
+                    <input type="text" value="search" id="media_input_search"/>
+                </div>
+                <div class="clear"></div>
+
+                {% block content %} 
+
+                <div class="item item_top ">
+                    <img class="item_img" src="http://static.notyourwork.com/img/milky/48/18.png"/>
+                    <span>media result Item 1</span>
+                    <div class="item_extra">
+                        <span>media search item description, file size, modification timestamp etc, </span>
+                    </div>
+                </div>
+                <div class="item ">
+                    <img class="item_img" src="http://static.notyourwork.com/img/milky/48/18.png"/>
+                    <span>media result Item 1</span>
+                    <div class="item_extra">
+                        <span>media search item description, file size, modification timestamp etc, </span>
+                    </div>
+                </div>
+                <div class="item item_bottom">
+                    <img class="item_img" src="http://static.notyourwork.com/img/construction.png"/>
+                    <span>media result Item 1</span>
+                    <div class="item_extra">
+                        <span>media search item description, file size, modification timestamp etc, </span>
+                    </div>
+                </div>
+                
+                {% endblock %} 
+                <div class="clear"></div>
+            </div>
+            <div class="clear"></div>
+        </div><!-- end id=nav -->
+        <div class="container_16 " id="foot">
+            {% block content-second %} {% endblock %} 
+        <div>
+    </div><!-- end id=body -->
+         
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script src="{% static "js/site.js" %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

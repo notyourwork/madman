@@ -1,0 +1,35 @@
+{% extends "base.html" %} 
+
+{% block content %}
+    <div class="twelvecol last">
+        <p>You can contact restatour in a few ways: </p>
+        <p>Email us at <a href="mailto:email@address.com">restatouremail@address.com</a>, twitter, facebook, or use the form below.</p>
+    </div>
+    <div class="twelvecol last" >  
+        {{ form.non_field_errors }}
+        <form action="" method="post">
+            <div class="fieldWrapper">
+                <div class="twelvecol last">{{ form.name.label_tag }}</div>
+                {% if form.name.errors %} 
+                    <div class="twelvecol last error">{{ form.name.errors }}</div>
+                {% endif %} 
+                <div class="twelvecol last">{{ form.name }}</div>
+            </div>
+            <div class="fieldWrapper">
+                <div class="twelvecol last">{{ form.email.label_tag }} </div>
+                {% if form.email.errors %} 
+                    <div class="twelvecol last error">{{ form.email.errors }}</div>
+                {% endif %} 
+                <div class="twelvecol last">{{ form.email }}</div>
+            </div>
+            <div class="fieldWrapper">
+                <div class="twelvecol last">{{ form.body.label_tag }} </div>
+                {% if form.body.errors %} 
+                    <div class="twelvecol last error">{{ form.body.errors }}</div>
+                {% endif %} 
+                <div class="twelvecol last">{{ form.body }}</div>
+            </div>
+            <p><input type="submit" value="Send message" /></p>
+        </form>
+    </div> 
+{% endblock %}

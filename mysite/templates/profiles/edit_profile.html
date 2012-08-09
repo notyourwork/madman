@@ -1,0 +1,19 @@
+{% extends "loggedin.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<h1>{{user}}</h1>
+<hr/>
+<p><a href="{% url django.contrib.auth.views.password_change %}">Change Password</a></p>
+
+<form action="" method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+
+    {{ form.as_p }}
+    <p><input type="submit" value="Update Profile" /></p>
+</form>
+
+{% endblock %}
+
+

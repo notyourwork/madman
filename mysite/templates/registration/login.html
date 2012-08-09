@@ -1,0 +1,43 @@
+{% extends "registration/base.html" %}
+
+{% block title %}{{ block.super }} :: Login{% endblock %}
+
+{% block content %}
+    <div class="grid_16">
+        <h1>Login</h1>
+    </div>
+    <div class="grid_4">
+        
+        {% if form.errors %}
+            <p class="error">Please correct the errors below:</p>
+        {% endif %}
+
+        <form method="post" action="?next={{ next|default:"/" }}">{% csrf_token %}
+            <dl>
+                <dt>
+                    <label for="id_username">Username</label>
+                    {% if form.username.errors %} <span class="error">{{ form.username.errors|join:", " }}</span>{% endif %}
+                </dt>
+                <dd>
+                    {{ form.username }}
+                </dd>
+                <dt>
+                    <label for="id_password">Password</label>
+                    {% if form.password.errors %} <span class="error">{{ form.password.errors|join:", " }}</span>{% endif %}
+                </dt>
+                <dd>
+                    {{ form.password }}
+                </dd>
+                <dt>
+                    <input type="submit" value="Log in" />
+                </dt>
+            </dl>
+        </form>
+    </div>
+    <div class="grid_12">
+
+        <p>If you don't have an account too bad you probably shouldn't be here anyway.</p>
+    </div>
+    {{block.super}}
+
+{% endblock %}

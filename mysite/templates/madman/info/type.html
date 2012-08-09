@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}madman:{{ location }}{% endblock %}
+
+
+{% block sidenavigation %}
+<a href="">type specific :w
+nav</a>
+{% endblock %}
+
+{% block content %}
+
+        <div class="tencol last"> 
+            <h1>Media Type: {{ mediaType }}</h1>
+            {% if locations %}
+                <ul>
+                {% for loc in locations %}
+                <li>{{ loc }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No locations available for this type..</p>
+            {% endif %}        
+     
+            <h1>Filesstuff should be around here somewhere. ..</h1>
+        </div> 
+  
+
+{% endblock %}
+
+
+
