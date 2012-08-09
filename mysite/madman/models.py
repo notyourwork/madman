@@ -35,9 +35,11 @@ class MediaType( models.Model ):
         return self.name
     @models.permalink
     def get_absolute_url( self ):
-        return ('madman_mediatype', (), { 'id': self.pk })
+        return ('mediatype', (), { 'id': self.pk })
     def get_named_url( self ):
         return self.name 
+    def get_locations( self ):
+        return MediaLocation.objects.filter(location_type=self.pk, parent=None)    
 
 class MediaLocation( models.Model ):
     name = models.CharField(

@@ -28,17 +28,11 @@ handler403 = 'madman.error_views.custom_403'
 
 @login_required
 def index( request ):
+    media_types = MediaType.objects.all() 
     current_locations = MediaLocation.objects.filter( parent=None ).order_by( 'name')
     newest_locations = MediaLocation.objects.all( ).order_by( 'created_time' )[ :5 ]
     latest_file_list = MediaFile.objects.all().order_by('created_time')[:5]
     return render(request, 'madman/main.html', locals() )
-
-@login_required
-def template(request, template_type=None):
-    if template_type:
-        return render(request, "madman/%s.html" % template_type, locals() ) 
-    else:
-        return render(request, "madman/base.html", locals() ) 
 
 @login_required
 def mediafilenewest( request ):
@@ -47,23 +41,10 @@ def mediafilenewest( request ):
     return HttpResponse( output )
 
 @login_required 
-def media_location(request, id = None, med_loc_name = None, template_name='madman/medialocation/detail.html'):
-    if med_loc_name: 
-        l = get_by_name( med_loc_name ) 
-    else:
-        l = get_object_or_404(MediaLocation, pk=id)  
+def mediatype(request, id = None, template_name='madman/info/type.html'):
+    mediatype = get_object_or_404(MediaType, pk=id)  
     return render( request, template_name, locals() ) 
 
-def get_by_name( media_name ):
-    '''
-    media search for something with name given 
-    '''
-    event_name = event_name.replace('-',' ') 
-    try: 
-        return MediaType.objects.filter(name__iexact=media_name).get()
-    except ObjectDoesNotExist:
-        raise Http404         
-    
 @login_required
 def mediafile(request, id=None):
     f = get_object_or_404(MediaFile, pk=id)
@@ -85,8 +66,8 @@ def medialocation(request, id=None):
     files = MediaFile.objects.filter(location=location).order_by('name')
     locations = MediaLocation.objects.filter(parent=id).order_by('name')
 
+    #build files in location pagniation
     filepaginator = Paginator(files, 10)
-    # Make sure page request is an int. If not, deliver first page.
     try:
         filepage = int(request.GET.get('filepage', '1'))
     except ValueError:
@@ -96,6 +77,7 @@ def medialocation(request, id=None):
         paginatedFileList = filepaginator.page(filepage)
     except (EmptyPage, InvalidPage):
         paginatedFileList = filepaginator.page(filepaginator.num_pages)    
+    #build locations in location pagniation 
     locationpaginator = Paginator(locations, 10)
     # Make sure page request is an int. If not, deliver first page.
     try:
@@ -109,17 +91,18 @@ def medialocation(request, id=None):
         paginatedLocationList = locationpaginator.page(locationpaginator.num_pages)    
     return render(request, 'madman/info/location.html', locals() ) 
 
-
-def mediatype(request, id=None, type_name=None):
-    mt = MediaType.objects.get(pk=type_id)
-    locations = MediaLocation.objects.filter(mediaType=id, parent=None)
-    return render(request, 'madman/info/type.html', locals() )
-
 def report( request ):
     report = {} 
     report['Total Size'] = 0 
     report['Location Count'] = MediaLocation.objects.count() 
     report['File Count'] = MediaFile.objects.count()  
     return render(request, 'madman/report.html', locals() )
+
+@login_required
+def template(request, template_type=None):
+    if template_type:
+        return render(request, "madman/%s.html" % template_type, locals() ) 
+    else:
+        return render(request, "madman/base.html", locals() ) 
 
 
