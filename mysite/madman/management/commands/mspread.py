@@ -3,7 +3,7 @@ from optparse import OptionParser
 from django.core.management.base import BaseCommand, CommandError, NoArgsCommand
 from django.conf import settings 
 from madman.models import * 
-from madman.utility import ask_question, confirm
+from madman.utility import *
 import os
 import re  
 import types 
