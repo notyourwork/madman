@@ -137,7 +137,10 @@ for root, dirs, files in os.walk(SITE_ROOT):
 
 #import madman settings 
 try:
-    from madman.settings import * 
-except ImportError:
-    print "Error importing local madman settings, please edit madman.settings before continuing."
+    LOCAL_SETTINGS
+except NameError:
+    try:
+        from local_settings import * 
+    except ImportError:
+        print "Error importing local madman settings, please copy local_settings_dist.py to local_settings.py."
 
