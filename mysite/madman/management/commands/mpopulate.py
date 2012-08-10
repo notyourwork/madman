@@ -21,7 +21,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         verbose = options.get('delete')
         print "Searching locations..."
-        locations = self.get_locations() 
+        locations = self.get_locations()
         if len(locations): 
             print "The following %d locations will be scanned for media: %s\n" % (len(locations), ', '.join([l.name for l in locations]), )
             raw_input("Press any key to continue")
