@@ -5,7 +5,7 @@ from madman import media_processor
 
 DEBUG = True
 # Set DEBUG = True if on the production server
-if socket.gethostname() == 'media.notyourwork.com':
+if socket.gethostname() == '<define host here>':
     DEBUG = False
 else:
     DEBUG = True
@@ -15,9 +15,9 @@ TEMPLATE_DEBUG = DEBUG
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'madmanDjango',                      
-        'USER': 'root',         
-        'PASSWORD': 'ttoorr',           
+        'NAME': 'db name',                      
+        'USER': '',         
+        'PASSWORD': '',           
         'HOST': '', 
         'PORT': '',             
     }
@@ -27,16 +27,13 @@ SECRET_KEY = 'gxhr1css-@8&^x-&16trb09rprbsh#su__*@^#b1f@k-=1*o1='
 
 TIME_ZONE = 'America/New_York'
 
-MEDIA_ROOT = '/var/www/sitemedia/django/'
+MEDIA_ROOT = ''
 
-MEDIA_URL = 'http://sitemedia.notyourwork.com/madman/media/'
+MEDIA_URL = ''
 
-#STATIC_ROOT = '/var/www/sitemedia/django/static/'
-STATIC_ROOT = '/var/git/mad-man/mysite/static/' 
+STATIC_ROOT = '' 
 
-STATIC_URL = 'http://sitemedia.notyourwork.com/madman/'
-
-ADMIN_MEDIA_PREFIX = 'http://sitemedia.notyourwork.com/django/'
+STATIC_URL = ''
 
 STATICFILES_DIRS = (
 )
@@ -61,24 +58,11 @@ LOGGING = {
 }
 
 MADMAN_DOWNLOAD_PLACES = [
-    #'/media/downloads/ircdownloads/complete/',
     '/media/downloads/seeding/',
 ]
 
 MADMAN_SEEDING_PLACES = [    
     '/media/downloads/seeding', 
-]
-
-MADMAN_MEDIA_PLACES = [
-    '/media/hdmovies1',
-    '/media/hdmovies2',
-    '/media/hdmovies3',
-    '/media/hdmoves4',
-    '/media/movies1',
-    '/media/hdtv1',
-    '/media/hdtv2',
-    '/media/tv1',
-    '/media/tv2',
 ]
 
 MADMAN_MEDIA_CONFIG  = {
@@ -98,13 +82,4 @@ MADMAN_MEDIA_CONFIG  = {
         ('/media/tv1/', '[0-9A-J]' ), 
         ('/media/tv2', '[K-Z]' ),  
     ),
-    'hdtv' : (
-        media_processor.tv_processor, 
-        ('/media/hdtv1','[0-9A-H]' ),
-        ('/media/hdtv2','[I-Q]' ),
-        ('/media/hdtv3', '[R-S]' ),
-    ),
-    'music' : (
-        ('/media/music1/', '[0-9A-G]' ),
-    )
 }
