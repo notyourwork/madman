@@ -33,7 +33,7 @@ if __name__ == "__main__":
     
     #drop database and recreate 
     cursor.execute("DROP DATABASE IF EXISTS `%s`; CREATE DATABASE %s;" % (dbname, dbname))
-
+    cursor.close()
     manage_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'mysite/manage.py'
@@ -45,12 +45,16 @@ if __name__ == "__main__":
         'syncdb']
     ) 
     puts(colored.green("[madman] Converting database tables to utf8"))
-    fix_mysql_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        'scripts/fix_mysql.py',
-    )
-    subprocess.call(['python', fix_mysql_path])
-
+    init()
+    cursor.execute("ALTER DATABASE `%s` CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci'" % dbname)
+    sql = "SELECT DISTINCT(table_name) FROM information_schema.columns WHERE table_schema = '%s'" % dbname
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    for row in results:
+        sql = "ALTER TABLE `%s` convert to character set DEFAULT COLLATE DEFAULT" % (row[0])
+        print sql
+        cursor.execute(sql)
+    cursor.close()
     
     print "[madman] Installing madman"
     subprocess.call(['python', manage_path, 'minstall'])
