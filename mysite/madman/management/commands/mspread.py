@@ -64,8 +64,7 @@ class Command(BaseCommand):
 
     def handle(self, *app_labels, **options):
         self.prompt = options['prompt']
-        if options['debug']:
-            self.debug = True 
+        if options['debug']: self.debug = True
         
         if options['locations']:
             self.locations = options['locaions'].split(',')  
@@ -89,7 +88,7 @@ class Command(BaseCommand):
                     all_media[loc] = items 
             print "Searching content type: %s [%d locations with %d items]" % (media, len(locations), item_count )
 
-        #for all locations and items within we want to check they belong 
+        #for all locations and items within check they belong 
         wrong_location = [] 
         for location in all_media:
             print " -processing %s" % location 

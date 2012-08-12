@@ -2,7 +2,6 @@ import os
 from django.conf import settings 
 
 def movie_processor(path, symlink=None):
-    
     #processes movies and adjusts any symlinks 
     #symlink argument defaults to none in which case 
     #path argument is moved to appropriate location

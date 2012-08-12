@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.contrib.auth.forms import UserCreationForm
 from django.views.decorators.csrf import csrf_protect, requires_csrf_token
+from django.contrib import messages
 from django.contrib.auth import logout
 from django.http import HttpResponse
 from django.core import serializers

@@ -13,12 +13,9 @@ from time import time
 import datetime 
 import types 
 from optparse import OptionParser
-from django.conf import settings 
 
 import logging 
 logger = logging.getLogger(__name__)
-import os 
-from django.conf import settings 
 
 
 def ask_question( question ):
@@ -432,6 +429,24 @@ def get_location_processor( location ):
         for item in items:
             if location == item[0]:
                 return get_processor( key )
+
+def get_config_locations( media_type=None ):
+    #@TODO try except KeyError on config dict 
+    try:
+        config = getattr(settings, 'MADMAN_MEDIA_CONFIG', []) 
+        locations = []
+        if media_type: 
+            media_def = filter(lambda i: type(i) == type(()) , config[media_type])
+            for location, regex in media_def:
+                locations.append(location) 
+        else:
+            for key in config:
+                media_def = filter(lambda i: type(i) == type(()) , config[key])
+                for location, regex in media_def:
+                    locations.append(location) 
+        return locations
+    except KeyError, e:
+        print e 
 
 def get_locations( media_type=None ):
     #@TODO try except KeyError on config dict 

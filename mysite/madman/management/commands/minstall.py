@@ -81,45 +81,8 @@ class Command(BaseCommand):
         else:
             self.report.append("%d users exist." % (User.objects.count(), ))
     def add_types(self ):
-        #media_conf = getattr(settings,'DATABASES')['default']['NAME']
-        #for m in media_conf:
-        #    for i in media_conf[m]:
-        #        print i 
-    
-        #movies -> hd movie, sd movie 
-        hdMovieType, c = MediaType.objects.get_or_create(name="HD Movie", definition="([^\\/]*)(\d{4})([^\\/]*)" )
-        sdMovieType, c = MediaType.objects.get_or_create(name="SD Movie")
-        movieType, c = MediaType.objects.get_or_create(name="Movie", definition="([^\\/]*)(\d{4})([^\\/]*)" )
-        movieType.types.add(hdMovieType) 
-        movieType.types.add(sdMovieType)    
-        movieType.save() 
-        #tv -> season tv, episode tv 
-        seaTvType, c = MediaType.objects.get_or_create(name="Season" )
-        epTvType, c = MediaType.objects.get_or_create(name="Episode", definition="([^\\/]*)[Ss](\d{2})[\.\-]([^\\/]*)")
-        tvType, c = MediaType.objects.get_or_create(name="Television Show" )
-        tvType.types.add(seaTvType)
-        tvType.save()
-        seaTvType.types.add(epTvType)
-        seaTvType.save()
-        musicType, c = MediaType.objects.get_or_create(name="Music") 
-        musicType.save() 
-        #video -> movie, #video -> tv 
-        videoType, c = MediaType.objects.get_or_create(name="Video")
-        videoType.types.add(movieType) 
-        videoType.types.add(tvType)
-        videoType.save() 
-        #audio, #audio -> music 
-        audioType, c = MediaType.objects.get_or_create(name="Audio")
-        audioType.types.add(musicType) 
-        audioType.save() 
-        #images  
-        imageType, c = MediaType.objects.get_or_create(name="Image")
-        #parent media class 
-        mediaType,c = MediaType.objects.get_or_create(name="Media")
-        mediaType.types.add(videoType)
-        mediaType.types.add(imageType)
-        mediaType.types.add(audioType) 
-        mediaType.save()  
+        for t in get_types():
+            new_type, c = MediaType.objects.get_or_create(name=t)
         self.report.append('Madman MediaTypes populated.') 
     def add_location( self, name ):
         try: 

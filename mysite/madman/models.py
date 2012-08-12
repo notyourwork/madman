@@ -40,7 +40,8 @@ class MediaType( models.Model ):
         return self.name 
     def get_locations( self ):
         return MediaLocation.objects.filter(location_type=self.pk, parent=None)    
-
+    def get_files( self ):
+        return MediaFile.objects.filter(file_type=self.pk)
 class MediaLocation( models.Model ):
     name = models.CharField(
         "Location Name", 
@@ -103,7 +104,7 @@ class MediaLocation( models.Model ):
         #filenames = [f for f in filenames if not re.match(excludes, f)]
         #filenames = [f for f in filenames if re.match(includes, f)]
         
-        excludes = ['lost+found', '.DS_STORE', '.Trash-500', ]
+        excludes = ['lost+found', '.DS_STORE', '.Trash-500', 'All-files-CRC-OK' ]
         if not item in excludes:
             return item
     @models.permalink
@@ -168,6 +169,7 @@ class MediaFile(models.Model):
         blank=True, 
         on_delete=models.SET_NULL
     )
+    file_type = models.ForeignKey( MediaType, blank=True, null=True )
     size = models.BigIntegerField("Size of MediaFile",default=0 )
     history = audit.AuditTrail()
     updated_time = models.DateTimeField("Updated Date", blank=True, null=True, auto_now=True )

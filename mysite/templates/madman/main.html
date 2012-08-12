@@ -18,6 +18,7 @@
             <img class="item_img" src="{% static "img/milky/48/18.png"%}"/>
             <span><a href="{{media_type.get_absolute_url}}">{{ media_type}}</a></span>
             <br/>
+            locations:{{ media_type.get_locations.count }} , files: {{media_type.get_files.count }}
         </div>
     {% empty %} 
         <p>No media types defined!</p>
