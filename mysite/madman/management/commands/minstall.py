@@ -86,7 +86,7 @@ class Command(BaseCommand):
         self.report.append('Madman MediaTypes populated.') 
     def add_location( self, name ):
         try: 
-            location, created = MediaLocation.objects.get_or_create(path=name, full_path=name)
+            location, created = MediaLocation.objects.get_or_create(path=name, full_path=name, )
             if created:  
                 found = location.find() 
                 return "%d added from %s" % (len(found), name, )

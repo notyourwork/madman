@@ -42,6 +42,7 @@ class MediaType( models.Model ):
         return MediaLocation.objects.filter(location_type=self.pk, parent=None)    
     def get_files( self ):
         return MediaFile.objects.filter(file_type=self.pk)
+
 class MediaLocation( models.Model ):
     name = models.CharField(
         "Location Name", 

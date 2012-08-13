@@ -1,5 +1,4 @@
 from django.db import models
-from madman.models import *
 from django.conf import settings 
 from clint.textui import * 
 import os
@@ -87,8 +86,9 @@ def humanize_bytes( bytes ):
     return size
 
 def get_classification_dict( ):
-    #get a compiled list of all media defintions 
-    types = dict() 
+    #get a compiled list of all media defintions
+    from madman.models import MediaType 
+    types = dict()
     for t in MediaType.objects.all():
         types[t.name] = re.compile( t.definition )
     return types 
@@ -131,6 +131,7 @@ def classify_media( name ):
     '''returns MediaType for a given input, 
     input is  if input is (file or directory)
       and determines what it is, movie, '''
+    from madman.models import MediaType
     types = dict() 
     for t in MediaType.objects.all():
         types[t.name] = re.compile( t.definition )
@@ -262,127 +263,6 @@ def is_located(path, reg_ex):
         test = reg_ex.match( media_name ) 
     return test 
 
-def main():
-    #the main guy, doing all the work.  
-    #1. find all items in all types of media 
-    #2.  
-    parser = get_parser()  
-    (options, args) = parser.parse_args()
-
-    locations = [] 
-    items = [] 
-    all_media = {} 
-    item_count = 0 
-    #iterate over config and get media locations
-    #and then iterate over locations to get all items
-    #in location 
-    
-    config = getattr(settings, 'MADMAN_MEDIA_CONFIG', {})
-    for media in config:
-        locations = get_locations(media)  
-        for loc in locations:
-            items = get_media(loc)
-            item_count += len(items)
-            try: 
-                all_media[loc].extend(items)  
-            except KeyError, e:
-                all_media[loc] = items 
-        print "Searching content type: %s [%d locations with %d items]" % (media, len(locations), item_count )
-
-    #for all locations and items within we want to check they belong 
-    wrong_location = [] 
-    for location in all_media:
-        print " -processing %s" % location 
-        items = sorted(all_media[location] )
-        reg_ex = get_re( location )
-        for item in items:
-            full_path = os.path.join(location, item) 
-            if not is_located( full_path, reg_ex ):    
-                wrong_location.append(full_path) 
-                print " ->%s" % item  
-    
-    print "---------------------------------------------"
-    #for all media in wrong location, we want to run processor 
-    wrong_location = sorted(wrong_location)             
-    print "Found %d incorrectly located media items" % len(wrong_location) 
-    for item in wrong_location:
-        print " -%s "  % item
-        f = get_location_processor( os.path.dirname( item ) )
-        link = find_symlink( item )  
-        if link:
-            print " --> linked %s" % (link, ) 
-            f(item, link)
-        else:
-            print " --X unlinked, can safely be moved "   
-            f(item)
-
-def movie_processor(path, symlink=None):
-    #processes movies and adjusts any symlinks 
-    #symlink argument defaults to none in which case 
-    #path argument is moved to appropriate location
-    #
-    #if symlink is passed in, we will adjust symlink
-    #after move is made 
-    config = getattr(settings, 'MADMAN_MEDIA_CONFIG', {})
-    
-    movie = os.path.basename(path) 
-    type_choices =  filter(lambda i: type(i) == type(()), config['hdmovies'])  
-    new_path = get_new_location( movie, type_choices)
-    new_full_path = os.path.join(new_path, movie)
-    if not file_exists( new_full_path ):
-        if confirm("'%s' --> '%s' ?" % (path, new_full_path) ):
-            try: 
-                shutil.move(path, new_path)         #move original file to new location 
-                if symlink:
-                    try:
-                        os.remove(symlink)
-                        os.symlink(new_full_path, symlink) 
-                    except Error, e:
-                        print e 
-            except shutil.Error, e:
-                print "error occured with %s path ignoring" % path
-    else:
-        print "%s already exists" % new_full_path
- 
-def music_processor(path):
-    #@TODO processor for music 
-    print "processed %s" % path 
-
-def tv_processor(path): 
-    print "tv processed %s" % path  
-
-def load_config():
-    #initialize the global config 
-    #with media types, locations and definitions 
-    global config
-    config  = {
-        'hdmovies' : (
-            movie_processor, 
-            ('/media/hdmovies1', "[0-9A-E]"), 
-            ('/media/hdmovies2', '[F-L]'), 
-            ('/media/hdmovies3', '[M-R]'), 
-            ('/media/hdmovies4', '[S-Z]'), 
-        ),
-        #'movies' : (
-        #    movie_processor, 
-        #    ('/media/movies1', '[(0-9A-Z]'), 
-        #), 
-        #'tv' : (
-        #    tv_processor, 
-        #    ('/media/tv1/', '[0-9A-J]' ), 
-        #    ('/media/tv2', '[K-Z]' ),  
-        #),
-        #'hdtv' : (
-        #    tv_processor, 
-        #    ('/media/hdtv1','[0-9A-H]' ),
-        #    ('/media/hdtv2','[I-Q]' ),
-        #    ('/media/hdtv3', '[R-S]' ),
-        #),
-        #'music' : (
-        #    ('/media/music1/', '[0-9A-G]' ),
-        #)
-    }
-    
 def get_processor( media_type ):
     #returns a processor function for a given type of media
     #defined in the global config.  
@@ -479,6 +359,15 @@ def get_types( ):
     config = getattr(settings, 'MADMAN_MEDIA_CONFIG', []) 
     return [m for m in config] 
 
+def get_type( location ):
+    config = getattr(settings, 'MADMAN_MEDIA_CONFIG', [])
+    for key in config:
+        if location in config[key]:
+            return key 
+        else:
+            pass 
+    return None 
+ 
 def confirm(prompt=None, resp=False):
     """prompts for yes or no response from the user. Returns True for yes and
     False for no.
@@ -517,37 +406,3 @@ def confirm(prompt=None, resp=False):
             return True
         if ans == 'n' or ans == 'N':
             return False
-def movie_processor(path, symlink=None):
-    
-    #processes movies and adjusts any symlinks 
-    #symlink argument defaults to none in which case 
-    #path argument is moved to appropriate location
-    #
-    #if symlink is passed in, we will adjust symlink
-    #after move is made 
-    config = getattr(settings, 'MADMAN_MEDIA_CONFIG', {})
-    movie = os.path.basename(path) 
-    type_choices =  filter(lambda i: type(i) == type(()), config['hdmovies'])  
-    new_path = get_new_location( movie, type_choices)
-    new_full_path = os.path.join(new_path, movie)
-    if not file_exists( new_full_path ):
-        if confirm("'%s' --> '%s' ?" % (path, new_full_path) ):
-            try: 
-                shutil.move(path, new_path)         #move original file to new location 
-                if symlink:
-                    try:
-                        os.remove(symlink)
-                        os.symlink(new_full_path, symlink) 
-                    except Error, e:
-                        print e 
-            except shutil.Error, e:
-                print "error occured with %s path ignoring" % path
-    else:
-        print "%s already exists" % new_full_path
- 
-def music_processor(path):
-    #@TODO processor for music 
-    print "processed %s" % path 
-
-def tv_processor(path): 
-    print "tv processed %s" % path  
