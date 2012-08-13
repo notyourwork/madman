@@ -12,6 +12,34 @@ from django.contrib.auth.models import User
 import logging 
 logger = logging.getLogger(__name__) 
 
+#class BaseCommentAbstractModel(models.Model):
+#    """
+#    An abstract base class that any custom comment models probably should
+#    subclass.
+#    """
+#
+#    # Content-object field
+#    content_type   = models.ForeignKey(ContentType,
+#            verbose_name=_('content type'),
+#            related_name="content_type_set_for_%(class)s")
+#    object_pk      = models.TextField(_('object ID'))
+#    content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+#
+#    # Metadata about the comment
+#    site        = models.ForeignKey(Site)
+#
+#    class Meta:
+#       abstract = True
+#
+#    def get_content_object_url(self):
+#        """
+#        Get a URL suitable for redirecting to the content object.
+#        """
+#        return urlresolvers.reverse(
+#            "comments-url-redirect",
+#            args=(self.content_type_id, self.object_pk)
+#        )
+
 #class BasicMedia( models.Model ):
 #    name = models.CharField( max_length=255, db_index=True, unique=True )
 #    updated_time = models.DateTimeField("Updated Date", blank=True, null=True )

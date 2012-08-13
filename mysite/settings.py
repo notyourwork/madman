@@ -40,8 +40,6 @@ STATIC_ROOT = ''
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = ''
 
-#deprecated in django 1.4
-ADMIN_MEDIA_PREFIX = ''
 
 STATICFILES_DIRS = (
 )
