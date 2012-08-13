@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from madman import audit 
-from madman.utility import * 
+from madman import utility 
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
@@ -89,8 +89,12 @@ class MediaLocation( models.Model ):
         self.size = self.get_size() 
         #if this type is empty and parent is defined 
         #use parent for media type 
-        if not self.location_type and self.parent:
-            self.location_type = self.parent.get_type()
+        if not self.location_type: 
+            if self.parent:
+                self.location_type = self.parent.get_type()
+            else:
+                print "getting type for full path"
+                self.location_type = utility.get_type( self.get_path() )
         super(MediaLocation, self).save(*args, **kwargs) 
     def location_filter( self, item ):
         #includes = ['*.mp3', '*.avi', '*.tar', '*.rar','*.tar.gz','*.iso','*.mkv','*.wmv','*.r[d3]','*.pdf','*.zip'] # for files only
@@ -134,9 +138,9 @@ class MediaLocation( models.Model ):
         else:
             return self.path
     def print_size( self ):
-        return humanize_bytes( self.size )
+        return utility.humanize_bytes( self.size )
     def get_size( self ):
-        return get_dir_size( self.get_path() )
+        return utility.get_dir_size( self.get_path() )
     def find( self ):  
         found = []
         try:  
@@ -151,7 +155,7 @@ class MediaLocation( models.Model ):
                         found.extend(location.find())
                 elif os.path.isfile(full_path) and not os.path.islink( full_path):
                     #store media file or 
-                    f, created = MediaFile.objects.get_or_create( name="%s" % item, location=self, size=get_size(full_path) ) 
+                    f, created = MediaFile.objects.get_or_create( name="%s" % item, location=self, size=utility.get_size(full_path) ) 
                     if created: 
                         found.append( f ) 
                 elif os.path.islink( full_path ) and os.path.exists( fullname ):
@@ -193,11 +197,11 @@ class MediaFile(models.Model):
             size = os.path.getsize( self.get_path() )
         except OSError:
             size = 0
-        return humanize_bytes( size )
+        return utility.humanize_bytes( size )
     def get_size( self ):
         return self.size
     def print_size( self ):
-        return humanize_bytes( self.size )
+        return utility.humanize_bytes( self.size )
     def get_location( self ):
         return self.location
     @models.permalink

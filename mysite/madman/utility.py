@@ -362,8 +362,13 @@ def get_types( ):
 def get_type( location ):
     config = getattr(settings, 'MADMAN_MEDIA_CONFIG', [])
     for key in config:
-        if location in config[key]:
-            return key 
+        if location in get_locations(key):
+            from madman.models import MediaType
+            try: 
+                media_type = MediaType.objects.get(name=key)
+            except MediaType.DoesNotExist, e:
+                media_type = None  
+            return media_type 
         else:
             pass 
     return None 
