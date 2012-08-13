@@ -93,7 +93,6 @@ class MediaLocation( models.Model ):
             if self.parent:
                 self.location_type = self.parent.get_type()
             else:
-                print "getting type for full path"
                 self.location_type = utility.get_type( self.get_path() )
         super(MediaLocation, self).save(*args, **kwargs) 
     def location_filter( self, item ):

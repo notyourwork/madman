@@ -7,7 +7,7 @@ from django.db import connection, transaction
 
 #madman imports 
 from madman.models import * 
-from madman.utility import *  
+from madman import utility 
 #clint CLI lib import 
 from clint.textui import puts, indent, progress, colored
 import os, re, sys 
@@ -25,8 +25,8 @@ class Command(BaseCommand):
     prompt = False 
     downloads = getattr(settings, 'MADMAN_DOWNLOAD_PLACES', [] ) 
     seedings = getattr(settings, 'MADMAN_SEEDING_PLACES', [] )
-    #media = getattr(settings, 'MADMAN_MEDIA_PLACES', [])
-    media = get_locations()  
+    media = utility.get_locations()  
+    download_locations = utility.get_download_locations() 
     option_list = BaseCommand.option_list  + (
         make_option(
             '-c', '--check', action='store_true', dest='check', default=False,
@@ -53,7 +53,7 @@ class Command(BaseCommand):
         #process media    
         self.add_types() 
         self.process_media() 
-    
+     
         #display report
         puts(colored.yellow('Madman Installation Report'))
         for r in self.report:
@@ -81,7 +81,7 @@ class Command(BaseCommand):
         else:
             self.report.append("%d users exist." % (User.objects.count(), ))
     def add_types(self ):
-        for t in get_types():
+        for t in utility.get_types():
             new_type, c = MediaType.objects.get_or_create(name=t)
         self.report.append('Madman MediaTypes populated.') 
     def add_location( self, name ):
@@ -121,24 +121,12 @@ class Command(BaseCommand):
         else:
             puts(colored.red("`MADMAN_MEDIA_PLACES` not defined in settings file!"))
             sys.exit(colored.yellow('Exiting.'))
-    def prepare_db( self ):
-        cursor = connection.cursor()
-        db = getattr(settings,'DATABASES')['default']['NAME']
-        print db
-        cursor.execute("DROP database %s" % (db, ))
-        transaction.commit_unless_managed()
-        cursor.execute("CREATE database %s" % (db,))
-        transaction.commit_unless_managed()
-        self.report.append('Database prepared.')
-        cursor.execute("alter table %s.madman_mediafile CONVERT to character set utf8 COLLATE utf8_general_ci" % (db,) )
-        cursor.execute("alter table %s.madman_mediatype CONVERT to character set utf8 COLLATE utf8_general_ci" % (db,) )
-        cursor.execute("alter table %s.madman_medialocation CONVERT to character set utf8 COLLATE utf8_general_ci" % (db,) )
-        cursor.execute("alter table %s.madman_medialink CONVERT to character set utf8 COLLATE utf8_general_ci" % (db,) )
-        cursor.execute("alter table %s.madman_mediatree CONVERT to character set utf8 COLLATE utf8_general_ci" % (db,) )
-        cursor.execute("alter table %s.madman_audit CONVERT to character set utf8 COLLATE utf8_general_ci" % (db,) )
     def process_media( self ):
-        puts(colored.yellow("Processing media: %s" %(','.join(self.media))))
+        puts(colored.yellow("processing media: %s" %(','.join(self.media))))
         for i in progress.bar( self.media ):
+            result = self.add_location( i ) 
+            self.report.append("%s" % (result,))
+        for i in progress.bar( self.download_locations ):
             result = self.add_location( i ) 
             self.report.append("%s" % (result,))
     def set_location( self, attr ):

@@ -328,8 +328,10 @@ def get_config_locations( media_type=None ):
     except KeyError, e:
         print e 
 
+def get_download_locations( ):
+    return getattr(settings, 'MADMAN_DOWNLOAD_PLACES', []) 
+    
 def get_locations( media_type=None ):
-    #@TODO try except KeyError on config dict 
     try:
         config = getattr(settings, 'MADMAN_MEDIA_CONFIG', []) 
         locations = []
