@@ -1,18 +1,14 @@
-{% extends "loggedin.html" %}
+{% extends "base.html" %}
 {% load i18n %}
 
 {% block content %}
 
 {% if profile %} 
-
     <h1>{{profile}}</h1>
-    <a href="{% url profiles_edit_profile %}">{% trans "Edit Profile" %}</a>
-    <img src="{% if profile.avatar_image_url %}{{profile.avatar_image_url}}{% else %}/static/img/avatar.jpg{% endif %}" style="float:right;"/>
-    <div>
-        {% if profile.user_info %} 
-            {{profile.user_info}}
-        {% endif %} 
-    </div>
+        <p>date joined:{{profile.user.date_joined}}</p>
+        <p>last login:{{profile.user.last_login}}</p>
+        <p>location: </p>
+        <a href="{% url profiles_edit_profile %}">{% trans "Edit Profile" %}</a>
 {% else %} 
     <h1>user not found</h1>
 {% endif %} 

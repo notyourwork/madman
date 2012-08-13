@@ -1,18 +1,25 @@
-{% extends "loggedin.html" %}
+{% extends "base.html" %}
 {% load i18n %}
 
 {% block content %}
 
-<h1>{{user}}</h1>
-<hr/>
-<p><a href="{% url django.contrib.auth.views.password_change %}">Change Password</a></p>
+<!-- Example row of columns -->
+<div class="row">
+    <div class="span16">
+        <h1><a href="{{ user.get_profile.get_absolute_url }}">{{user}}</a></h1>
+        <hr/>
+        <p><a href="{% url django.contrib.auth.views.password_change %}">Change Password</a></p>
 
-<form action="" method="post">{% csrf_token %}
-    {{ form.non_field_errors }}
-
-    {{ form.as_p }}
-    <p><input type="submit" value="Update Profile" /></p>
-</form>
+    </div>
+</div>
+<div class="row">
+    <div class="span16">
+        <form action="" method="post">{% csrf_token %}
+            {{ form.as_p }}
+            <p><input type="submit" value="Update Profile" /></p>
+        </form>
+    </div>
+</div>
 
 {% endblock %}
 
