@@ -1,6 +1,5 @@
 import os 
 from django.conf import settings 
-from madman import utility 
 
 def movie_processor(path, symlink=None):
     #processes movies and adjusts any symlinks 
@@ -9,6 +8,7 @@ def movie_processor(path, symlink=None):
     #
     #if symlink is passed in, we will adjust symlink
     #after move is made 
+    from madman import utility 
     config = getattr(settings, 'MADMAN_MEDIA_CONFIG', {})
     movie = os.path.basename(path) 
     type_choices =  filter(lambda i: type(i) == type(()), config['hd movies'])  
