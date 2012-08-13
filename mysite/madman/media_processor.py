@@ -1,6 +1,7 @@
 import os 
 from django.conf import settings 
 from madman import utility 
+
 def movie_processor(path, symlink=None):
     #processes movies and adjusts any symlinks 
     #symlink argument defaults to none in which case 

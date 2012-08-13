@@ -36,7 +36,7 @@ class Command(BaseCommand):
             dest="locations",
             default='',
             choices=[''].extend( get_locations() ), 
-            help="the path to process, default is all locations"  
+            help="the path to process, default is all locations, choices = %s" % get_locations()   
         ),
         make_option(
             "-t", "--type",
@@ -44,7 +44,7 @@ class Command(BaseCommand):
             dest="type",
             default='',
             choices=[''].extend( get_types() ), 
-            help='select a type of media to process'
+            help='select a type of media to process, types = %s' % get_types() 
         ),
         make_option(
             "-d", "--debug",
