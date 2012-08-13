@@ -1,6 +1,6 @@
 import os 
 from django.conf import settings 
-
+from madman import utility 
 def movie_processor(path, symlink=None):
     #processes movies and adjusts any symlinks 
     #symlink argument defaults to none in which case 
@@ -10,10 +10,10 @@ def movie_processor(path, symlink=None):
     #after move is made 
     config = getattr(settings, 'MADMAN_MEDIA_CONFIG', {})
     movie = os.path.basename(path) 
-    type_choices =  filter(lambda i: type(i) == type(()), config['hdmovies'])  
-    new_path = get_new_location( movie, type_choices)
+    type_choices =  filter(lambda i: type(i) == type(()), config['hd movies'])  
+    new_path = utility.get_new_location( movie, type_choices)
     new_full_path = os.path.join(new_path, movie)
-    if not file_exists( new_full_path ):
+    if not utility.file_exists( new_full_path ):
         if confirm("'%s' --> '%s' ?" % (path, new_full_path) ):
             try: 
                 shutil.move(path, new_path)         #move original file to new location 
