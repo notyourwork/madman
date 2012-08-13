@@ -20,7 +20,7 @@ SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 FORMAT = '%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
 FORMAT='%(asctime)s - %(levelname)s\n%(message)s\n--------------------------------'
 
-logging.basicConfig( level=logging.INFO, format=FORMAT, )
+logging.basicConfig( level=logging.ERROR, format=FORMAT, )
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#time-zone 
 TIME_ZONE = 'America/New_York'

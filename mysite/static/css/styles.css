@@ -1,0 +1,282 @@
+html, body {    
+    height: 100%;
+}
+body{
+    background:#aaa;
+    background-image: url('http://static.notyourwork.com/img/stripe_big_bg.png');
+    background-repeat: repeat-both;
+}
+
+#header{
+    background:#444;
+    padding-top:16px;
+    -webkit-border-top-left-radius: 10px;
+    -khtml-border-radius-topleft: 10px; 
+    -moz-border-radius-topleft: 10px;
+    border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -khtml-border-radius-topright: 10px;    
+    -moz-border-radius-topright: 10px;
+    border-top-right-radius: 10px;
+}
+#body{
+
+}
+#logo{
+    height:60px;
+    padding:5px 0 5px 0;
+}
+
+#status{
+    color:#fff;
+    font-size:1.1em;
+    text-align:right;
+}
+#status p{
+    margin:0;
+}
+
+#inputArea{
+    font-family: Arial, Sans-Serif;
+    font-size: 18px;
+    padding:10px 0 10px 0;
+}
+
+#inputArea input, #inputArea textarea{
+    font-family: Arial, Sans-Serif;
+    font-size: 13px;
+    margin-bottom: 5px;
+    display: block;
+    padding: 4px;
+    width: 100%;
+    -webkit-border-top-left-radius: 10px;
+    -khtml-border-radius-topleft: 10px; 
+    -moz-border-radius-topleft: 10px;
+    border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -khtml-border-radius-topright: 10px;    
+    -moz-border-radius-topright: 10px;
+    border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -khtml-border-radius-bottomleft: 10px;  
+    -moz-border-radius-bottomleft: 10px;
+    border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    -khtml-border-radius-bottomright: 10px; 
+    -moz-border-radius-bottomright: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.activeField{
+    background-image: none;
+    background-color: #ffffff;
+    border: solid 1px #33677F;
+}
+
+.idle{
+border: solid 1px #D0DEBD;
+    background:#EDF9DD;
+/**
+background-image: url( 'blue_bg.png' );
+background-repeat: repeat-x;
+background-position: top;
+*/
+}
+
+#search_options{
+    min-height:250px;
+    text-align:center;
+}
+#nav{
+    color:#fff;
+    background:#444;
+    padding-bottom:10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -khtml-border-radius-bottomleft: 10px;  
+    -moz-border-radius-bottomleft: 10px;
+    border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    -khtml-border-radius-bottomright: 10px; 
+    -moz-border-radius-bottomright: 10px;
+    border-bottom-right-radius: 10px;
+}
+#nav_top{
+   color:#666;  
+    background-image: url('http://static.notyourwork.com/img/stripe_bg.png');
+    background-repeat: repeat-both;
+    margin-bottom:3px;
+    min-height:20px;
+    padding:0 5px 0 5px; 
+    -webkit-border-bottom-left-radius: 10px;
+    -khtml-border-radius-bottomleft: 10px;  
+    -moz-border-radius-bottomleft: 10px;
+    border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    -khtml-border-radius-bottomright: 10px; 
+    -moz-border-radius-bottomright: 10px;
+    border-bottom-right-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -khtml-border-radius-topright: 10px;    
+    -moz-border-radius-topright: 10px;
+    border-top-right-radius: 10px;
+    z-index:2; 
+}
+.nav_top_item:hover{
+    color:#fff;
+    background:#56C456;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+}
+.nav_top_item_focus{
+    color:#fff;
+    background:#56C456;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+}
+#logo_box{
+    background-image: url('http://static.notyourwork.com/img/stripe_bg.png');
+    background-repeat: repeat-both;
+    -webkit-border-top-left-radius: 10px;
+    -khtml-border-radius-topleft: 10px; 
+    -moz-border-radius-topleft: 10px;
+    border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -khtml-border-radius-topright: 10px;    
+    -moz-border-radius-topright: 10px;
+    border-top-right-radius: 10px;
+
+}
+
+
+span.nav_top_item{
+    font-size:1.1em;
+    float:left; 
+    padding-right:8px;
+    padding-left:8px;
+}
+span.nav_top_item_last{
+    float:right;
+}
+
+#nav_bottom{
+    min-height:6px;
+}
+#nav_top, #nav_bottom{
+    text-align:center; 
+}
+
+
+.item{
+    color:#666;
+    min-height:55px;
+    font-size:1.15em;
+    border-bottom:1px solid #666; 
+    background:#fff;
+}
+.item:hover{
+    color:#333;
+}
+.item_focus{
+    color:#333;
+    background:#EDF9DD;
+    border-bottom:1px solid #666; 
+}
+.item_top{
+    -webkit-border-top-left-radius: 10px;
+    -khtml-border-radius-topleft: 10px; 
+    -moz-border-radius-topleft: 10px;
+    border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -khtml-border-radius-topright: 10px;    
+    -moz-border-radius-topright: 10px;
+    border-top-right-radius: 10px;
+}
+.item_bottom{
+    -webkit-border-bottom-left-radius: 10px;
+    -khtml-border-radius-bottomleft: 10px;  
+    -moz-border-radius-bottomleft: 10px;
+    border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    -khtml-border-radius-bottomright: 10px; 
+    -moz-border-radius-bottomright: 10px;
+    border-bottom-right-radius: 10px;
+}
+.item_extra{
+    float:right;
+    padding-right:10px; /** gives a little cushion off the right side of .item */ 
+    text-align:right; 
+}
+.item_img{
+    float:left;
+    height:50px; /** should be a bit less than .item the parent container */  
+}
+
+.floater_left{float:left;}
+.floater_right{float:right; padding-right:3px;}
+
+#overleft{
+    position:absolute;
+    width:960px; 
+    z-index:1; 
+    background:#444;
+/**
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=50);
+    -moz-opacity:0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+*/
+}
+
+#overleft_header, #control_panel{
+    margin-left:10px; 
+    margin-right:10px;
+    color:#666;  
+    margin-bottom:3px;
+    padding:0 5px 0 5px; 
+}
+#overleft_header{
+    min-height:20px;
+    background-image: url('http://static.notyourwork.com/img/stripe_bg.png');
+    background-repeat: repeat-both;
+    -webkit-border-bottom-left-radius: 10px;
+    -khtml-border-radius-bottomleft: 10px;  
+    -moz-border-radius-bottomleft: 10px;
+    border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    -khtml-border-radius-bottomright: 10px; 
+    -moz-border-radius-bottomright: 10px;
+    border-bottom-right-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -khtml-border-radius-topright: 10px;    
+    -moz-border-radius-topright: 10px;
+    border-top-right-radius: 10px;
+}
+
+#control_panel{
+    background:#fff;
+}
+
+a{
+    text-decoration:underline; 
+    color: #26B816; 
+}
+
+a:link{
+    color: #26B816; 
+}
+a:visited{
+    
+}
+a:hover{
+    background-color:#333;
+    color:#9CFF91;
+}
+a:active{
+
+}
+
