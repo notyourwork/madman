@@ -40,21 +40,19 @@ logger = logging.getLogger(__name__)
 #            args=(self.content_type_id, self.object_pk)
 #        )
 
-#class BasicMedia( models.Model ):
-#    name = models.CharField( max_length=255, db_index=True, unique=True )
-#    updated_time = models.DateTimeField("Updated Date", blank=True, null=True )
-#    created_time = models.DateTimeField("Created Date", blank=True, null=True )
-#    scraped_time = models.DateTimeField("Scraped Date", blank=True, null=True )
-#    accessed_time = models.DateTimeField("Accessed Date", blank=True, null=True )
+class BasicMediaModel( models.Model ):
+    #    name = models.CharField( max_length=255, db_index=True, unique=True )
+    created_time = models.DateTimeField("Created Date", blank=True, null=True )
+    updated_time = models.DateTimeField("Updated Date", blank=True, null=True )
+    accessed_time = models.DateTimeField("Accessed Date", blank=True, null=True )
+    scraped_time = models.DateTimeField("Scraped Date", blank=True, null=True )
+    class Meta:
+        abstract = True
     
-class MediaType( models.Model ):
+class MediaType( BasicMediaModel ):
     name = models.CharField( max_length=255, db_index=True, unique=True )
     types = models.ManyToManyField('self', null=True, symmetrical=False)
     definition = models.CharField(max_length=255, db_index=True, blank=True )
-    updated_time = models.DateTimeField("Updated Date", blank=True, null=True )
-    created_time = models.DateTimeField("Created Date", blank=True, null=True )
-    scraped_time = models.DateTimeField("Scraped Date", blank=True, null=True )
-    accessed_time = models.DateTimeField("Accessed Date", blank=True, null=True )
     class Meta:
         verbose_name = _('Media Type')
         verbose_name_plural = _('Media Types')
@@ -68,10 +66,8 @@ class MediaType( models.Model ):
         return self.name 
     def get_locations( self ):
         return MediaLocation.objects.filter(location_type=self.pk, parent=None)    
-    def get_files( self ):
-        return MediaFile.objects.filter(file_type=self.pk)
 
-class MediaLocation( models.Model ):
+class MediaLocation( BasicMediaModel ):
     name = models.CharField(
         "Location Name", 
         max_length=255, 
@@ -90,14 +86,6 @@ class MediaLocation( models.Model ):
     ) 
     location_type = models.ForeignKey(MediaType, null=True, blank=True, on_delete=models.SET_NULL )
     history = audit.AuditTrail() 
-    updated_time = models.DateTimeField("Updated Date", blank=True, null=True, auto_now=True )
-    created_time = models.DateTimeField("Created Date", blank=True, null=True, auto_now_add=True )
-    scraped_time = models.DateTimeField("Scraped Date", blank=True, null=True )
-    accessed_time = models.DateTimeField(
-        "Accessed Date", 
-        blank=True, 
-        null=True 
-    )
     size = models.CharField( 
         "Location Size", 
         max_length=50, 
@@ -124,18 +112,6 @@ class MediaLocation( models.Model ):
                 self.location_type = utility.get_type( self.get_path() )
         super(MediaLocation, self).save(*args, **kwargs) 
     def location_filter( self, item ):
-        #includes = ['*.mp3', '*.avi', '*.tar', '*.rar','*.tar.gz','*.iso','*.mkv','*.wmv','*.r[d3]','*.pdf','*.zip'] # for files only
-        #excludes = ['Trash-500','All-files-CRC-OK*', '.', '..']
-
-        #includes = r'|'.join([fnmatch.translate(x) for x in includes])
-        #excludes = r'|'.join([fnmatch.translate(x) for x in excludes]) or r'$.'
-        
-        #dirnames[:] = [os.path.join(root, d) for d in dirnames]
-        #dirnames[:] = [d for d in dirnames if not re.match(excludes, d)]
-        #filenames = [os.path.join(root, f) for f in filenames]
-        #filenames = [f for f in filenames if not re.match(excludes, f)]
-        #filenames = [f for f in filenames if re.match(includes, f)]
-        
         excludes = ['lost+found', '.DS_STORE', '.Trash-500', 'All-files-CRC-OK' ]
         if not item in excludes:
             return item
@@ -190,9 +166,9 @@ class MediaLocation( models.Model ):
         except:
             logger.error( "self.full_path=%s\nitem=%s" % (full_path, item,) )
             return found 
-        return found 
+        return found
 
-class MediaFile(models.Model):
+class MediaFile( BasicMediaModel ):
     """A file object stored on some device."""
     name = models.CharField("MediaFile Name", max_length=255, db_index=True)
     location = models.ForeignKey(
@@ -204,10 +180,6 @@ class MediaFile(models.Model):
     file_type = models.ForeignKey( MediaType, blank=True, null=True )
     size = models.BigIntegerField("Size of MediaFile",default=0 )
     history = audit.AuditTrail()
-    updated_time = models.DateTimeField("Updated Date", blank=True, null=True, auto_now=True )
-    created_time = models.DateTimeField("Created Date", blank=True, null=True, auto_now_add=True )
-    scraped_time = models.DateTimeField("Scraped Date", blank=True, null=True )
-    accessed_time = models.DateTimeField("Accessed Date", blank=True, null=True )
     class Meta:
         get_latest_by = "created_time"
     def __unicode__(self):
@@ -235,7 +207,7 @@ class MediaFile(models.Model):
     def get_absolute_url(self):
         return ('mediafile', (), { 'id': self.pk }) 
 
-class MediaLink(models.Model):
+class MediaLink( BasicMediaModel ):
     """Object for representing symlinks and their
     relation to locations/files they represent.
     
