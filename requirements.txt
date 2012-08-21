@@ -22,3 +22,5 @@ clint==0.3.1
 django-mailer
 django-taggit>=0.9.3
 django-contact-form>=0.3
+tvnamer>=2.2.1
+tvdb_api>=1.7.2
