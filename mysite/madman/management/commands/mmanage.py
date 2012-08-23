@@ -124,7 +124,7 @@ class Command(BaseCommand):
             self.process_locations()
             self.locations = tmplocations
             if not self.test:
-                d, created = MediaLocation.objects.get_or_ceeate( path=name )
+                d, created = MediaLocation.objects.get_or_create( path=name )
             else:
                 print "This is where we would add the dir"
         else: 
