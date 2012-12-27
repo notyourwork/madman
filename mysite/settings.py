@@ -106,10 +106,8 @@ INSTALLED_APPS = (
     'taggit',                   #for tagging jobs, bids, pitches and such 
     'madman', 
     'django_extensions', 
-    'mptt',
     'compressor',  
     'mailer', 
-    'contact_form',             #django contact-form app 
 )
 
 LOGGING = {

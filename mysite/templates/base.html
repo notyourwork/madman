@@ -55,7 +55,6 @@
                 <ul class="nav pull-left">
                     <li class="active"><a href="{% url 'home' %}">Home</a></li>
                     {% block extra_nav %}{% endblock %} 
-                    <li><a href="{% url 'contact_form' %}">Contact</a></li>
                     {% get_flatpages as flatpages %}
                     {% for page in flatpages %}
                     <li><a href="{{page.url}}">{{page.title}}</a></li>

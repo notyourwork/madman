@@ -19,6 +19,5 @@ urlpatterns = patterns('',
     ),
         #default rest of the profile section
     url(r'^profiles/', include('profiles.urls')),
-    url(r'^contact/', include('contact_form.urls')),    
 )
 

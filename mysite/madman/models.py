@@ -1,6 +1,5 @@
 from django.db import models
 import os, fnmatch, stat, mimetypes, datetime, re 
-from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -234,16 +233,6 @@ class MediaLink( BasicMediaModel ):
         return ("%s/%s" % (self.location.get_path(), self.name) )
     def get_file_path( self ):
         return "%s" % (self.mediafile.get_path(), )
-
-class MediaTree( MPTTModel ):
-    name = models.CharField( max_length=50, unique=True ) 
-    mediatype = models.ForeignKey(MediaType, null=True, blank=True, on_delete=models.SET_NULL )
-    parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
-    def __unicode__(self):
-        return self.name
-    class MPTTMeta:
-        order_insertion_by = ['name']
-
 
 class UserProfile(models.Model):
     '''an extension on pybb userprofile for storing batter
