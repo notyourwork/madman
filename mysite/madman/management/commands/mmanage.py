@@ -85,7 +85,8 @@ class Command(BaseCommand):
         print "confirming locations",  self.locations
         new_locations = [] 
         if self.prompt:
-            if not confirm(colored.yellow("Do you want to process the following %d locations: %s" % (len(self.locations), self.locations, )), True): 
+            question = colored.yellow("Do you want to process the following %d locations: %s" % (len(self.locations), self.locations, ))
+            if not confirm(question, True): 
                 sys.exit("User aborted, no locations to process. Exiting.")
     def process_item( self, name, base=None ): 
         """processes the given item, name, 
@@ -167,7 +168,6 @@ class Command(BaseCommand):
             if self.debug:
                 print "We have already encountered '%s' and are skipping it" % name
             self.ignore_count += 1 
-
  
     def process_file( self, name ): 
         #try to get object from database by its base name 

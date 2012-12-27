@@ -138,6 +138,7 @@ TEMPLATE_DIRS = ()
 for root, dirs, files in os.walk(SITE_ROOT):
     if 'templates' in dirs: TEMPLATE_DIRS += (os.path.join(root, 'templates'),)
 
+
 #import madman settings 
 try:
     LOCAL_SETTINGS
@@ -146,4 +147,3 @@ except NameError:
         from local_settings import * 
     except ImportError:
         print "Error importing local madman settings, please copy local_settings_dist.py to local_settings.py."
-
