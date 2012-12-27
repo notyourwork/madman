@@ -1,3 +1,4 @@
-Project madman.  
+Madman
+============
 
-Media management, distribution.  
+Python based media management and distribution system. 
