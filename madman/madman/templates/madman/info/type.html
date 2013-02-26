@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+ 
+{% block title %}madman:{{ media_type }}{% endblock %}
+
+{% block content %}
+<div class="grid_16">
+    <h1>{{mediatype}}</h1>
+</div>
+
+<div class="grid_8"> 
+    <a href="{% url admin:madman_mediatype_change mediatype.pk %}">Edit Type</a>
+    <h2>Locations</h2>
+    {% for location in mediatype.get_locations %}
+        <div class="item
+            {% if forloop.first %}item_top{% endif %}
+            {% if forloop.last %}item_bottom{% endif %} 
+        ">
+            <img class="item_img" src="{% static "img/milky/48/18.png"%}"/>
+            <span><a href="{{ location.get_absolute_url }}">{{ location.name }}</a></span>                                                                          
+            <br/>
+            <span>{{ location.get_path }}</span>
+            
+        </div>
+    {% empty %} 
+    <p>No files right now.</p>
+                
+    {% endfor %}
+</div> 
+{% endblock %}
+

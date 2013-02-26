@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %} 
+
+{% block title %}{{ block.super }} :: Homepage{% endblock %}
+
+
+{% block extra_nav %}
+{% endblock %}
+
+{% block content %}
+
+<div class="grid_8">
+    <h1>Media Types</h1>
+    {% for media_type in media_types %}
+        <div class="item 
+        {% if forloop.first %}item_top{% endif %}
+        {% if forloop.last %}item_bottom{% endif %} 
+        ">
+            <img class="item_img" src="{% static "img/milky/48/18.png"%}"/>
+            <span><a href="{{media_type.get_absolute_url}}">{{ media_type}}</a></span>
+            <br/>
+            locations:{{ media_type.get_locations.count }} , files: {{media_type.get_files.count }}
+        </div>
+    {% empty %} 
+        <p>No media types defined!</p>
+    {% endfor %} 
+    <h1>Media Locations</h1>
+    {% for location in current_locations %}
+        <div class="item 
+        {% if forloop.first %}item_top{% endif %}
+        {% if forloop.last %}item_bottom{% endif %} 
+        ">
+            <img class="item_img" src="{% static "img/milky/48/18.png"%}"/>
+            <span><a href="{{location.get_absolute_url}}">{{ location.name|title }}</a> </span>
+            <br/>
+            <span> {{location.print_size}} {{location.updated_time|date:"m/d/y H:m:s"}} </span>
+        </div>
+   {% empty %} 
+        <div class="item">No media locations defined right now.</div>
+   {% endfor %}
+    
+</div>
+<div class="grid_8">
+    <h1>Latest Media Locations</h1>
+    <ul>
+    {% for location in newest_locations %}
+        <div class="item 
+        {% if forloop.first %}item_top{% endif %}
+        {% if forloop.last %}item_bottom{% endif %} 
+        ">
+            <img class="item_img" src="{% static "img/milky/48/18.png"%}"/>
+            <span><a href="{{location.get_absolute_url}}">{{ location.name|title }}</a></span>
+            <br/>
+            <span> {{location.print_size}} {{location.updated_time|date:"m/d/y H:m:s"}} </span>
+        </div>
+   {% empty %} 
+        <div class="item">No media locations defined right now.</div>
+   {% endfor %}
+    </ul>
+
+    <h1>Media Files</h1>
+    {% for file in latest_file_list %}
+        <div class="item
+            {% if forloop.first %}item_top{% endif %}
+            {% if forloop.last %}item_bottom{% endif %} 
+        ">
+            <img class="item_img" src="{% static "img/milky/48/18.png"%}"/>
+            <span><a href="{{ file.get_absolute_url }}">{{ file.name }}</a></span>
+            <br/>
+            <span>{{ file.get_location.get_path }}</span>
+            
+        </div>
+    {% empty %} 
+    <p>No files right now.</p>
+                
+    {% endfor %}
+</div>
+{% endblock %}
+
+

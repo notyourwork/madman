@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %} 
+{% load url from future %}
+
+{% block title %}{{ block.super }} :: {{ flatpage.title }}{% endblock %}
+
+{% block metatags %}{% endblock %} 
+
+{% block madmannav %}
+{% endblock %}
+
+{% block content %}
+<div class="grid_16">
+    <h1>{{ flatpage.title }}</h1>    
+    <div>
+        {{ flatpage.content }}
+    </div> 
+</div>
+{% endblock %}
+
+
