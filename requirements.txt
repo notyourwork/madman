@@ -5,7 +5,7 @@ BeautifulSoup==3.2.0
 cheetah==2.4.4
 modwsgideploy==0.4.20dev
 python-memcached==1.48
-html5lib==0.95
+html5lib==0.999999999
 slimit==0.7.4
 PIL==1.1.7
 South==0.7.5
